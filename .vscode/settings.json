@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.tmpl": "html"
+  },
+  "emmet.triggerExpansionOnTab": true,
+  "emmet.showExpandedAbbreviation": "inMarkupAndStylesheetFilesOnly"
+}
