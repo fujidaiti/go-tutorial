@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"path/filepath"
 )
 
 func RenderTemplate(w http.ResponseWriter, templateFile string) {
 	tmpl, err := templateFor(templateFile)
 	if err != nil {
 		fmt.Println("Something went wrong: ", err)
-		tmpl, _ = templateFor("templates/error.page.tmpl")
+		tmpl, _ = templateFor("error")
 	}
 
 	err = tmpl.Execute(w, nil)
@@ -20,24 +21,26 @@ func RenderTemplate(w http.ResponseWriter, templateFile string) {
 	}
 }
 
-var cache = make(map[string]*template.Template)
+var cachedTemplates = map[string]*template.Template{}
 
-func templateFor(templateFile string) (*template.Template, error) {
-	tmpl, cached := cache[templateFile]
-	if !cached {
-		files := []string{
-			fmt.Sprintf("templates/%s", templateFile),
-			"templates/base.layout.tmpl",
+func templateFor(pageName string) (*template.Template, error) {
+	tmpl, cached := cachedTemplates[pageName]
+	if cached {
+		fmt.Println("Using cache: ", pageName)
+	} else {
+		srcFiles := []string{fmt.Sprintf("templates/%s.page.tmpl", pageName)}
+		layoutFiles, err := filepath.Glob("templates/*.layout.tmpl")
+		if err != nil {
+			return nil, err
 		}
-
-		var err error
-		tmpl, err = template.ParseFiles(files...)
+		srcFiles = append(srcFiles, layoutFiles...)
+		tmpl, err = template.ParseFiles(srcFiles...)
 		if err != nil {
 			return nil, err
 		}
 
-		cache[templateFile] = tmpl
-		fmt.Println("Cache template: ", templateFile)
+		cachedTemplates[pageName] = tmpl
+		fmt.Println("Cache template: ", pageName)
 	}
 
 	return tmpl, nil

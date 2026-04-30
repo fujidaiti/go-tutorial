@@ -7,9 +7,9 @@ import (
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	renderer.RenderTemplate(w, "home.page.tmpl")
+	renderer.RenderTemplate(w, "home")
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
-	renderer.RenderTemplate(w, "about.page.tmpl")
+	renderer.RenderTemplate(w, "about")
 }
