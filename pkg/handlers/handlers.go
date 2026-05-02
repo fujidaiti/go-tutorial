@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/fujidaiti/go-tutorial/pkg/renderer"
+	"github.com/fujidaiti/bookings/pkg/renderer"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {

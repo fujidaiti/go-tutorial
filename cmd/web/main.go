@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/fujidaiti/go-tutorial/pkg/handlers"
+	"github.com/fujidaiti/bookings/pkg/handlers"
 )
 
 const portNumber = ":8080"

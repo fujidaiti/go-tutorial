@@ -1,3 +1,3 @@
-module github.com/fujidaiti/go-tutorial
+module github.com/fujidaiti/bookings
 
 go 1.26.2
