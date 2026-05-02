@@ -15,5 +15,11 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Get("/", handlers.Home)
 	r.Get("/about", handlers.About)
+	r.Get("/contact", handlers.Contact)
+	r.Get("/generals-quarters", handlers.Generals)
+	r.Get("/majors-suite", handlers.Majors)
+	r.Get("/search-availability", handlers.SearchAvailability)
+	r.Get("/make-reservation", handlers.MakeReservation)
+	r.Get("/reservation-summary", handlers.ReservationSummary)
 	http.ListenAndServe(portNumber, r)
 }

@@ -1,0 +1,14 @@
+{{ template "base" . }}
+
+{{define "content"}}
+<h1>Search Availability</h1>
+<form method="POST" action="/search-availability">
+  <label for="start">Arrival date:</label>
+  <input type="date" id="start" name="start" />
+  <br />
+  <label for="end">Departure date:</label>
+  <input type="date" id="end" name="end" />
+  <br />
+  <button type="submit">Search</button>
+</form>
+{{ end }}
