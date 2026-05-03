@@ -82,7 +82,7 @@ func Book(w http.ResponseWriter, r *http.Request) {
 		data["Form"] = models.BookingForm{}
 	}
 
-	renderer.RenderTemplate(w, "book", data)
+	renderer.RenderTemplate(w, "booking-form", data)
 }
 
 func PostBook(w http.ResponseWriter, r *http.Request) {
@@ -100,18 +100,20 @@ func PostBook(w http.ResponseWriter, r *http.Request) {
 	result := form.Validate()
 
 	data := renderer.DefaultData(r)
-	if result.Valid() {
-		// TODO: Check if the room is available
-		// TODO: Save the reservation data to DB
-		// TODO: Redirect to the result page
-		w.Write([]byte("The room has been booked for you!"))
-	} else {
+	if !result.Valid() {
 		data["RoomId"] = id
 		data["RoomName"] = "Major's quarter"
 		data["Form"] = form
 		data["FormResult"] = result
-		renderer.RenderTemplate(w, "book", data)
+		renderer.RenderTemplate(w, "booking-form", data)
+		return
 	}
+
+	// TODO: Check if the room is available
+	// TODO: Save the reservation data to DB
+	data["Form"] = form
+	data["RoomName"] = "Major's quarter"
+	renderer.RenderTemplate(w, "booking-summary", data)
 }
 
 func ReservationSummary(w http.ResponseWriter, r *http.Request) {
