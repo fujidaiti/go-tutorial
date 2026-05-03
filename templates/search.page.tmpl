@@ -1,0 +1,39 @@
+{{ template "base" . }}
+
+{{define "content"}}
+<h1>Search</h1>
+<form method="POST" action="/search">
+  <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}" />
+  <label for="start">Arrival date:</label>
+  <input type="date" id="start" name="start" value="{{ .Form.Start }}"
+    {{if .FormResult.HasStartDateErr}} is-invalid {{end}} />
+  <br />
+  <label for="end">Departure date:</label>
+  <input type="date" id="end" name="end" value="{{ .Form.End }}"
+    {{if .FormResult.HasEndDateErr}} is-invalid {{end}} />
+  <br />
+  {{ if .FormResult.HasStartDateErr }}
+  <p style="color: red;">{{ .FormResult.StartDateErr }}</p>
+  {{ end }}
+  {{ if .FormResult.HasEndDateErr }}
+  <p style="color: red;">{{ .FormResult.EndDateErr }}</p>
+  {{ end }}
+  <br />
+  <button type="submit">Search</button>
+</form>
+
+<br />
+
+{{if .IsFormValid}}
+<h2>Available Rooms</h2>
+{{if .AvailableRooms}}
+<ul>
+  {{range .AvailableRooms}}
+  <li>{{.Name}} - <a href="/book/{{.ID}}">Book now</a></li>
+  {{end}}
+</ul>
+{{else if .IsFormValid}}
+<p>No rooms available for the selected dates.</p>
+{{end}}
+{{end}}
+{{end}}

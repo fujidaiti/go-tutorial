@@ -9,8 +9,8 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-func DefaultData(r *http.Request) map[string]string {
-	return map[string]string{
+func DefaultData(r *http.Request) map[string]any {
+	return map[string]any{
 		"CSRFToken": nosurf.Token(r),
 	}
 }
