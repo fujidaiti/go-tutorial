@@ -20,7 +20,6 @@ func main() {
 	r.Get("/generals-quarters", handlers.Generals)
 	r.Get("/majors-suite", handlers.Majors)
 	r.Get("/search", handlers.Search)
-	r.Post("/search", handlers.PostSearch)
 	r.Get("/make-reservation", handlers.MakeReservation)
 	r.Get("/reservation-summary", handlers.ReservationSummary)
 	http.ListenAndServe(portNumber, r)

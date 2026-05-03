@@ -28,17 +28,19 @@ func Majors(w http.ResponseWriter, r *http.Request) {
 }
 
 func Search(w http.ResponseWriter, r *http.Request) {
-	renderer.RenderTemplate(w, "search", renderer.DefaultData(r))
-}
+	q := r.URL.Query()
+	data := renderer.DefaultData(r)
+	if !q.Has("start") && !q.Has("end") {
+		renderer.RenderTemplate(w, "search", data)
+		return
+	}
 
-func PostSearch(w http.ResponseWriter, r *http.Request) {
 	form := models.SearchForm{
-		Start: r.Form.Get("start"),
-		End:   r.Form.Get("end"),
+		Start: q.Get("start"),
+		End:   q.Get("end"),
 	}
 	result := form.Validate()
 
-	data := renderer.DefaultData(r)
 	data["Form"] = form
 	data["FormResult"] = result
 	// TODO: Look up DB and return actual results
