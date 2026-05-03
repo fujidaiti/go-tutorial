@@ -2,7 +2,9 @@ package models
 
 import "time"
 
+// TODO: Rename to LengthOfStay or Los
 type SearchForm struct {
+	// TODO: Rename to Arrival and Departure
 	Start string
 	End   string
 }
@@ -13,8 +15,6 @@ type SearchFormValidationResult struct {
 	StartDateErr    string
 	EndDateErr      string
 }
-
-const dateFormat = "2006-01-02"
 
 func (s *SearchFormValidationResult) Valid() bool {
 	return !s.HasStartDateErr && !s.HasEndDateErr

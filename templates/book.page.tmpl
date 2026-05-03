@@ -1,0 +1,47 @@
+{{ template "base" . }}
+
+{{define "content"}}
+<h1>Make a Reservation</h1>
+<p>Room: {{ .RoomName }}</p>
+<h2>Details</h2>
+<form method="POST" action="/book/{{ .RoomId }}">
+  <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}"/>
+  <label for="arrival">Arrival:</label>
+  <input type="date" id="arrival" name="arrival" value="{{ .Form.Arrival }}" />
+  <br />
+  <label for="departure">Departure:</label>
+  <input type="date" id="departure" name="departure" value="{{ .Form.Departure }}" />
+  <br />
+  <label for="first_name">First Name:</label>
+  <input type="text" id="first_name" name="first_name" value="{{ .Form.FirstName }}" />
+  <br />
+  <label for="last_name">Last Name:</label>
+  <input type="text" id="last_name" name="last_name" value="{{ .Form.LastName }}" />
+  <br />
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" value="{{ .Form.Email }}" />
+  <br />
+  <label for="phone">Phone:</label>
+  <input type="text" id="phone" name="phone" value="{{ .Form.Phone }}" />
+  <br />
+  {{ if .FormResult.ArrivalErr }}
+  <p style="color: red;">{{ .FormResult.ArrivalErr }}</p>
+  {{ end }}
+  {{ if .FormResult.DepartureErr }}
+  <p style="color: red;">{{ .FormResult.DepartureErr }}</p>
+  {{ end }}
+  {{ if .FormResult.FirstNameErr }}
+  <p style="color: red;">{{ .FormResult.FirstNameErr }}</p>
+  {{ end }}
+  {{ if .FormResult.LastNameErr }}
+  <p style="color: red;">{{ .FormResult.LastNameErr }}</p>
+  {{ end }}
+  {{ if .FormResult.EmailErr }}
+  <p style="color: red;">{{ .FormResult.EmailErr }}</p>
+  {{ end }}
+  {{ if .FormResult.PhoneErr }}
+  <p style="color: red;">{{ .FormResult.PhoneErr }}</p>
+  {{ end }}
+  <button type="submit">Submit</button>
+</form>
+{{ end }}

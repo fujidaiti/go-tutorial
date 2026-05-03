@@ -28,7 +28,7 @@
 {{if .AvailableRooms}}
 <ul>
   {{range .AvailableRooms}}
-  <li>{{.Name}} - <a href="/book/{{.ID}}">Book now</a></li>
+  <li>{{.Name}} - <a href="/book/{{.ID}}?arrival={{ $.Form.Start }}&departure={{ $.Form.End }}">Book now</a></li>
   {{end}}
 </ul>
 {{else if .IsFormValid}}
