@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/fujidaiti/bookings/pkg/handlers"
-	"github.com/fujidaiti/bookings/pkg/middlewares"
+	"github.com/fujidaiti/bookings/internal/handlers"
+	"github.com/fujidaiti/bookings/internal/middlewares"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/fujidaiti/bookings/pkg/renderer"
+	"github.com/fujidaiti/bookings/internal/renderer"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
