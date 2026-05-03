@@ -5,16 +5,24 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+
+	"github.com/justinas/nosurf"
 )
 
-func RenderTemplate(w http.ResponseWriter, templateFile string) {
+func DefaultData(r *http.Request) map[string]string {
+	return map[string]string{
+		"CSRFToken": nosurf.Token(r),
+	}
+}
+
+func RenderTemplate(w http.ResponseWriter, templateFile string, data any) {
 	tmpl, err := templateFor(templateFile)
 	if err != nil {
 		fmt.Println("Something went wrong: ", err)
 		tmpl, _ = templateFor("error")
 	}
 
-	err = tmpl.Execute(w, nil)
+	err = tmpl.Execute(w, data)
 	if err != nil {
 		fmt.Println("Something went wrong: ", err)
 		w.Write([]byte("Oops, something went wrong..."))
