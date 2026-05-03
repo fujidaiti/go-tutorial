@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/fujidaiti/bookings/pkg/renderer"
@@ -33,7 +34,12 @@ func SearchAvailability(w http.ResponseWriter, r *http.Request) {
 func PostSearchAvailability(w http.ResponseWriter, r *http.Request) {
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
-	w.Write([]byte("Start date: " + start + ", End date: " + end))
+	fmt.Printf("Start: %s, End: %s\n", start, end)
+
+	data := renderer.DefaultData(r)
+	data["Start"] = start
+	data["End"] = end
+	renderer.RenderTemplate(w, "no-room-available", data)
 }
 
 func MakeReservation(w http.ResponseWriter, r *http.Request) {

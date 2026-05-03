@@ -1,0 +1,11 @@
+{{ template "base" . }}
+
+{{define "content"}}
+<h1>No Rooms Available</h1>
+<p>Sorry, but no rooms are available for the selected dates:</p>
+<ul>
+  <li>Start: {{ .Start }}</li>
+  <li>End: {{ .End }}</li>
+</ul>
+<a href="/search-availability">Search Again</a>
+{{ end }}
