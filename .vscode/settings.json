@@ -1,6 +1,6 @@
 {
   "files.associations": {
-    "*.tmpl": "html"
+    "*.tmpl": "gotmpl"
   },
   "emmet.triggerExpansionOnTab": true,
   "emmet.showExpandedAbbreviation": "inMarkupAndStylesheetFilesOnly"
