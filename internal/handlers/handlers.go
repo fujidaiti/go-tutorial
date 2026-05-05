@@ -180,8 +180,45 @@ func PostBooking(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Save the reservation data to DB
-	renderer.RenderTemplate(w, "booking-summary", data)
+	tx, err := repository.Db().Begin()
+	if err != nil {
+		panic(err)
+	}
+
+	var bookingId int
+	err = tx.QueryRow(
+		`INSERT INTO bookings (
+			first_name, last_name, email, phone,
+			arrival_date, departure_date, room_id
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		RETURNING id;
+		`,
+		form.FirstName, form.LastName, form.Email, form.Phone,
+		form.Arrival, form.Departure, roomId,
+	).Scan(&bookingId)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = tx.Exec(
+		`INSERT INTO room_restrictions (
+			arrival_date, departure_date, room_id, booking_id
+		)
+		VALUES ($1, $2, $3, $4);
+		`,
+		form.Arrival, form.Departure, roomId, bookingId,
+	)
+	if err != nil {
+		tx.Rollback()
+		panic(err)
+	}
+	err = tx.Commit()
+	if err != nil {
+		panic(err)
+	}
+
+	renderer.RenderTemplate(w, "booking-details", data)
 }
 
 func ReservationSummary(w http.ResponseWriter, r *http.Request) {
