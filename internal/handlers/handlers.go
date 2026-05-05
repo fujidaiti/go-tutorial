@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -53,6 +52,7 @@ func SearchDeluxeRooms(w http.ResponseWriter, r *http.Request) {
 	handleSearch(w, r, "Deluxe")
 }
 
+// TODO: Support pagination
 func handleSearch(w http.ResponseWriter, r *http.Request, grade string) {
 	q := r.URL.Query()
 	data := renderer.DefaultData(r)
@@ -78,14 +78,16 @@ func handleSearch(w http.ResponseWriter, r *http.Request, grade string) {
 		data["IsFormValid"] = true
 	}
 
-	var rows *sql.Rows
-	var err error
-	if len(grade) == 0 {
-		rows, err = repository.Db().Query(`
+	var gradeClause string
+	args := []any{form.Start, form.End}
+	if len(grade) > 0 {
+		gradeClause = "AND g.name = $3"
+		args = append(args, grade)
+	}
+	query := fmt.Sprintf(`
 		SELECT r.id, r.name, g.name
 		FROM rooms r
-		JOIN grades g
-		ON r.grade_id = g.id
+		JOIN grades g ON r.grade_id = g.id
 		WHERE NOT EXISTS (
 			SELECT 1
 			FROM room_restrictions rr
@@ -93,25 +95,10 @@ func handleSearch(w http.ResponseWriter, r *http.Request, grade string) {
 				AND rr.arrival_date <= $2
 				AND rr.departure_date >= $1
 		)
+		%s
 		ORDER BY g.rank DESC;
-	`, form.Start, form.End)
-	} else {
-		rows, err = repository.Db().Query(`
-		SELECT r.id, r.name, g.name
-		FROM rooms r
-		JOIN grades g
-		ON r.grade_id = g.id
-		WHERE g.name = $3
-			AND NOT EXISTS (
-				SELECT 1
-				FROM room_restrictions rr
-				WHERE rr.room_id = r.id
-					AND rr.arrival_date <= $2
-					AND rr.departure_date >= $1
-			)
-		ORDER BY g.rank DESC;
-	`, form.Start, form.End, grade)
-	}
+	`, gradeClause)
+	rows, err := repository.Db().Query(query, args...)
 	if err != nil {
 		panic(err)
 	}
