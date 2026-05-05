@@ -252,18 +252,19 @@ func BookingDetails(w http.ResponseWriter, r *http.Request) {
 	var bk models.BookingForm
 	var status string
 	var roomName string
+	var roomGrade string
 	err = repository.Db().QueryRow(
 		`SELECT
 			r.name, b.arrival_date, b.departure_date, b.first_name,
-			b.last_name, b.email, b.phone, b.status
+			b.last_name, b.email, b.phone, b.status, g.Name
 		FROM bookings b
-		JOIN rooms r
-		ON b.room_id = r.id
+		JOIN rooms r ON b.room_id = r.id
+		JOIN grades g ON r.grade_id = g.id
 		WHERE b.id = $1;
 		`, id,
 	).Scan(
 		&roomName, &bk.Arrival, &bk.Departure, &bk.FirstName,
-		&bk.LastName, &bk.Email, &bk.Phone, &status,
+		&bk.LastName, &bk.Email, &bk.Phone, &status, &roomGrade,
 	)
 	if err != nil {
 		panic(err)
@@ -278,6 +279,7 @@ func BookingDetails(w http.ResponseWriter, r *http.Request) {
 
 	data := renderer.DefaultData(r)
 	data["RoomName"] = roomName
+	data["RoomGrade"] = roomGrade
 	data["Form"] = bk
 	data["Status"] = status
 	renderer.RenderTemplate(w, "booking-details", data)
