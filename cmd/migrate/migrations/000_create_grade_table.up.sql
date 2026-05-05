@@ -1,6 +1,6 @@
-CREATE TABLE rooms (
+CREATE TABLE grades (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
-  grade_id INTEGER NOT NULL REFERENCES grades(id),
+  rank INTEGER NOT NULL UNIQUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+)
