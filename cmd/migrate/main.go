@@ -28,7 +28,7 @@ func main() {
 	}
 
 	var err error
-	ptn := fmt.Sprintf("migrations/*.%s.sql", direction)
+	ptn := fmt.Sprintf("cmd/migrate/migrations/*.%s.sql", direction)
 	files, err := filepath.Glob(ptn)
 	if err != nil {
 		panic(err)
