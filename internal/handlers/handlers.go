@@ -66,7 +66,8 @@ func Search(w http.ResponseWriter, r *http.Request) {
 			WHERE rr.room_id = r.id
 				AND rr.arrival_date <= $2
 				AND rr.departure_date >= $1
-		);
+		)
+		ORDER BY g.rank DESC;
 	`, form.Start, form.End)
 	if err != nil {
 		panic(err)
