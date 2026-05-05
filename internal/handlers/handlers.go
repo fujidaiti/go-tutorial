@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/fujidaiti/bookings/internal/models"
 	"github.com/fujidaiti/bookings/internal/renderer"
@@ -119,8 +120,10 @@ func Booking(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostBooking(w http.ResponseWriter, r *http.Request) {
-	// TODO: Check if ID is valid
-	id := r.PathValue("roomId")
+	roomId, err := strconv.Atoi(r.Form.Get("room_id"))
+	if err != nil {
+		panic(err)
+	}
 
 	form := models.BookingForm{
 		Arrival:   r.Form.Get("arrival"),
@@ -132,20 +135,52 @@ func PostBooking(w http.ResponseWriter, r *http.Request) {
 	}
 	result := form.Validate()
 
+	var room models.Room
+	err = repository.Db().QueryRow(
+		"SELECT id, name FROM rooms WHERE id = $1;", roomId,
+	).Scan(&room.ID, &room.Name)
+	if err != nil {
+		panic(err)
+	}
+
 	data := renderer.DefaultData(r)
-	if !result.Valid() {
-		data["RoomId"] = id
-		data["RoomName"] = "Major's quarter"
-		data["Form"] = form
-		data["FormResult"] = result
+	data["RoomId"] = room.ID
+	data["RoomName"] = room.Name
+	data["Form"] = form
+	data["FormResult"] = result
+
+	if result.Valid() {
+		data["FormValid"] = true
+	} else {
+		data["FormValid"] = false
 		renderer.RenderTemplate(w, "booking-form", data)
 		return
 	}
 
-	// TODO: Check if the room is available
+	var available bool
+	err = repository.Db().QueryRow(
+		`SELECT NOT EXISTS (
+			SELECT 1
+			FROM room_restrictions rr
+			WHERE rr.room_id = $1
+				AND rr.arrival_date <= $3
+				AND rr.departure_date >= $2
+			);
+		`,
+		roomId, form.Arrival, form.Departure,
+	).Scan(&available)
+	if err != nil {
+		panic(err)
+	}
+	if available {
+		data["RoomAvailable"] = true
+	} else {
+		data["RoomAvailable"] = false
+		renderer.RenderTemplate(w, "booking-form", data)
+		return
+	}
+
 	// TODO: Save the reservation data to DB
-	data["Form"] = form
-	data["RoomName"] = "Major's quarter"
 	renderer.RenderTemplate(w, "booking-summary", data)
 }
 

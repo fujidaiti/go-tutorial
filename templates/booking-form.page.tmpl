@@ -4,8 +4,9 @@
 <h1>Make a Reservation</h1>
 <p>Room: {{ .RoomName }}</p>
 <h2>Details</h2>
-<form method="POST" action="/booking/{{ .RoomId }}">
+<form method="POST" action="/booking">
   <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}"/>
+  <input type="hidden" name="room_id" value="{{ .RoomId }}"/>
   <label for="arrival">Arrival:</label>
   <input type="date" id="arrival" name="arrival" value="{{ .Form.Arrival }}" />
   <br />
@@ -44,4 +45,7 @@
   {{ end }}
   <button type="submit">Submit</button>
 </form>
+{{ if and .FormValid (not .RoomAvailable) }}
+<p style="color: red;">Sorry, but the room is not available in the selected dates.</p>
+{{ end }}
 {{ end }}
