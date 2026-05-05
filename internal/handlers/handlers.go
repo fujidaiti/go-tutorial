@@ -1,12 +1,11 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/fujidaiti/bookings/internal/models"
 	"github.com/fujidaiti/bookings/internal/renderer"
-	_ "github.com/lib/pq"
+	"github.com/fujidaiti/bookings/internal/repository"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -51,15 +50,9 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		data["IsFormValid"] = true
-		}
-
-	db, err := sql.Open("postgres", "sslmode=disable")
-	if err != nil {
-		panic(err)
 	}
-	defer db.Close()
 
-	rows, err := db.Query(`
+	rows, err := repository.Db().Query(`
 		SELECT r.id, r.name
 		FROM rooms r
 		WHERE NOT EXISTS (

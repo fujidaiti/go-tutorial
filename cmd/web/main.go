@@ -5,6 +5,7 @@ import (
 
 	"github.com/fujidaiti/bookings/internal/handlers"
 	"github.com/fujidaiti/bookings/internal/middlewares"
+	"github.com/fujidaiti/bookings/internal/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -12,6 +13,12 @@ import (
 const portNumber = ":8080"
 
 func main() {
+	err := repository.Init()
+	if err != nil {
+		panic(err)
+	}
+	defer repository.Db().Close()
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger, middlewares.NoSurf)
 	r.Get("/", handlers.Home)
