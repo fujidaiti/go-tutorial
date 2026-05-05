@@ -2,7 +2,10 @@
 
 {{define "content"}}
 <h1>Make a Reservation</h1>
-<p>Room: {{ .RoomName }}</p>
+<ul>
+  <li>Room: {{.RoomName}}</p>
+  <li>Grade: {{.Grade}}</p>
+</ul>
 <h2>Details</h2>
 <form method="POST" action="/booking">
   <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}"/>

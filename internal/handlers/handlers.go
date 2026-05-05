@@ -106,14 +106,21 @@ func Booking(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var room models.Room
-	err := repository.Db().QueryRow(
-		"SELECT id, name FROM rooms r WHERE id = $1;", id,
-	).Scan(&room.ID, &room.Name)
+	var grade string
+	err := repository.Db().QueryRow(`
+		SELECT r.id, r.name, g.name
+		FROM rooms r
+		JOIN grades g
+		ON r.grade_id = g.id
+		WHERE r.id = $1;
+		`, id,
+	).Scan(&room.ID, &room.Name, &grade)
 	if err != nil {
 		panic(err)
 	}
 	data["RoomId"] = room.ID
 	data["RoomName"] = room.Name
+	data["Grade"] = grade
 
 	los := models.SearchForm{
 		Start: q.Get("arrival"),
