@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/fujidaiti/bookings/internal/models"
@@ -32,8 +34,25 @@ func Majors(w http.ResponseWriter, r *http.Request) {
 }
 
 func Search(w http.ResponseWriter, r *http.Request) {
+	handleSearch(w, r, "")
+}
+
+func SearchStandardRooms(w http.ResponseWriter, r *http.Request) {
+	handleSearch(w, r, "Standard")
+}
+
+func SearchSuperiorRooms(w http.ResponseWriter, r *http.Request) {
+	handleSearch(w, r, "Superior")
+}
+
+func SearchDeluxeRooms(w http.ResponseWriter, r *http.Request) {
+	handleSearch(w, r, "Deluxe")
+}
+
+func handleSearch(w http.ResponseWriter, r *http.Request, grade string) {
 	q := r.URL.Query()
 	data := renderer.DefaultData(r)
+	data["Grade"] = strings.ToLower(grade)
 	if !q.Has("start") && !q.Has("end") {
 		renderer.RenderTemplate(w, "search", data)
 		return
@@ -55,7 +74,10 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		data["IsFormValid"] = true
 	}
 
-	rows, err := repository.Db().Query(`
+	var rows *sql.Rows
+	var err error
+	if len(grade) == 0 {
+		rows, err = repository.Db().Query(`
 		SELECT r.id, r.name, g.name
 		FROM rooms r
 		JOIN grades g
@@ -69,27 +91,40 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		)
 		ORDER BY g.rank DESC;
 	`, form.Start, form.End)
+	} else {
+		rows, err = repository.Db().Query(`
+		SELECT r.id, r.name, g.name
+		FROM rooms r
+		JOIN grades g
+		ON r.grade_id = g.id
+		WHERE g.name = $3
+			AND NOT EXISTS (
+				SELECT 1
+				FROM room_restrictions rr
+				WHERE rr.room_id = r.id
+					AND rr.arrival_date <= $2
+					AND rr.departure_date >= $1
+			)
+		ORDER BY g.rank DESC;
+	`, form.Start, form.End, grade)
+	}
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
 
-	type Result struct {
+	type SearchResult struct {
 		Room  models.Room
 		Grade string
 	}
-
-	var results []Result
+	var results []SearchResult
 	for rows.Next() {
 		var r models.Room
 		var g string
 		if err := rows.Scan(&r.ID, &r.Name, &g); err != nil {
 			panic(err)
 		}
-		results = append(results, Result{
-			Room:  r,
-			Grade: g,
-		})
+		results = append(results, SearchResult{r, g})
 	}
 
 	data["Results"] = results
