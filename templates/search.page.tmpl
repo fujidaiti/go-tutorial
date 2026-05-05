@@ -25,10 +25,10 @@
 
 {{if .IsFormValid}}
 <h2>Available Rooms</h2>
-{{if .AvailableRooms}}
+{{if .Results}}
 <ul>
-  {{range .AvailableRooms}}
-  <li>{{.Name}} - <a href="/booking?roomId={{ .ID }}&arrival={{ $.Form.Start }}&departure={{ $.Form.End }}">Book now</a></li>
+  {{range .Results}}
+  <li>{{.Grade}} - {{.Room.Name}} - <a href="/booking?roomId={{.Room.ID}}&arrival={{$.Form.Start}}&departure={{$.Form.End}}">Book now</a></li>
   {{end}}
 </ul>
 {{else if .IsFormValid}}

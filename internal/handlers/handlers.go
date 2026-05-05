@@ -56,8 +56,10 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rows, err := repository.Db().Query(`
-		SELECT r.id, r.name
+		SELECT r.id, r.name, g.name
 		FROM rooms r
+		JOIN grades g
+		ON r.grade_id = g.id
 		WHERE NOT EXISTS (
 			SELECT 1
 			FROM room_restrictions rr
@@ -71,16 +73,25 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	var rooms []models.Room
-	for rows.Next() {
-		var r models.Room
-		if err := rows.Scan(&r.ID, &r.Name); err != nil {
-			panic(err)
-		}
-		rooms = append(rooms, r)
+	type Result struct {
+		Room  models.Room
+		Grade string
 	}
 
-	data["AvailableRooms"] = rooms
+	var results []Result
+	for rows.Next() {
+		var r models.Room
+		var g string
+		if err := rows.Scan(&r.ID, &r.Name, &g); err != nil {
+			panic(err)
+		}
+		results = append(results, Result{
+			Room:  r,
+			Grade: g,
+		})
+	}
+
+	data["Results"] = results
 	renderer.RenderTemplate(w, "search", data)
 }
 
