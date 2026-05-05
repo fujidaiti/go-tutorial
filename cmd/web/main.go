@@ -20,7 +20,7 @@ func main() {
 	defer repository.Db().Close()
 
 	r := chi.NewRouter()
-	r.Use(middleware.Logger, middlewares.NoSurf)
+	r.Use(middleware.Logger, middlewares.NoSurf, middleware.Recoverer)
 	r.Get("/", handlers.Home)
 	r.Get("/standard", handlers.Standard)
 	r.Get("/standard/search", handlers.SearchStandardRooms)
