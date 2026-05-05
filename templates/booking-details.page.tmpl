@@ -1,16 +1,18 @@
 {{ template "base" . }}
 
 {{define "content"}}
-<h1>Booking Confirmed</h1>
-<h2>Room: {{ .RoomName }}</h2>
+<h1>Booking Details</h1>
+<h2>Room</h2>
+<p>{{ .RoomName }}</p>
+<h2>Your Information</h2>
 <ul>
   <li>Arrival: {{ .Form.Arrival }}</li>
   <li>Departure: {{ .Form.Departure }}</li>
-</ul>
-<h2>Your Information</h2>
-<ul>
   <li>Name: {{ .Form.FirstName }} {{ .Form.LastName }}</li>
   <li>Email: {{ .Form.Email }}</li>
-  <li>Phone: {{ .Form.Phone }}</li>
+  {{ with .Form.Phone }}
+  <li>Phone: {{ . }}</li>
+  {{ end }}
+  <li>Status: {{ .Status }}</li>
 </ul>
 {{end}}

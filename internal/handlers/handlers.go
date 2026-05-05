@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/fujidaiti/bookings/internal/models"
 	"github.com/fujidaiti/bookings/internal/renderer"
@@ -222,8 +223,45 @@ func PostBooking(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/booking/%d", bookingId), 303)
 }
 
+// TODO: Make this page visible from only person who made this reservation.
 func BookingDetails(w http.ResponseWriter, r *http.Request) {
-	renderer.RenderTemplate(w, "booking-details", renderer.DefaultData(r))
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	var bk models.BookingForm
+	var status string
+	var roomName string
+	err = repository.Db().QueryRow(
+		`SELECT
+			r.name, b.arrival_date, b.departure_date, b.first_name,
+			b.last_name, b.email, b.phone, b.status
+		FROM bookings b
+		JOIN rooms r
+		ON b.room_id = r.id
+		WHERE b.id = $1;
+		`, id,
+	).Scan(
+		&roomName, &bk.Arrival, &bk.Departure, &bk.FirstName,
+		&bk.LastName, &bk.Email, &bk.Phone, &status,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	if t, err := time.Parse(time.RFC3339, bk.Arrival); err == nil {
+		bk.Arrival = t.Format("2006-01-02")
+	}
+	if t, err := time.Parse(time.RFC3339, bk.Departure); err == nil {
+		bk.Departure = t.Format("2006-01-02")
+	}
+
+	data := renderer.DefaultData(r)
+	data["RoomName"] = roomName
+	data["Form"] = bk
+	data["Status"] = status
+	renderer.RenderTemplate(w, "booking-details", data)
 }
 
 func ReservationSummary(w http.ResponseWriter, r *http.Request) {
