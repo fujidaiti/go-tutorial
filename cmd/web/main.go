@@ -22,8 +22,6 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger, middlewares.NoSurf)
 	r.Get("/", handlers.Home)
-	r.Get("/about", handlers.About)
-	r.Get("/contact", handlers.Contact)
 	r.Get("/standard", handlers.Standard)
 	r.Get("/standard/search", handlers.SearchStandardRooms)
 	r.Get("/superior", handlers.Superior)
@@ -34,6 +32,5 @@ func main() {
 	r.Get("/booking", handlers.Booking)
 	r.Post("/booking", handlers.PostBooking)
 	r.Get("/booking/{id}", handlers.BookingDetails)
-	r.Get("/reservation-summary", handlers.ReservationSummary)
 	http.ListenAndServe(portNumber, r)
 }

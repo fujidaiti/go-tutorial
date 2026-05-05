@@ -323,7 +323,3 @@ func BookingDetails(w http.ResponseWriter, r *http.Request) {
 	data["Status"] = status
 	renderer.RenderTemplate(w, "booking-details", data)
 }
-
-func ReservationSummary(w http.ResponseWriter, r *http.Request) {
-	renderer.RenderTemplate(w, "reservation-summary", renderer.DefaultData(r))
-}
