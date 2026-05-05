@@ -85,13 +85,22 @@ func Booking(w http.ResponseWriter, r *http.Request) {
 	data := renderer.DefaultData(r)
 	data["FormResult"] = models.BookingFormValidationResult{}
 
-	id := r.PathValue("roomId")
-	// TODO: Get the actual room name from DB
-	room := "Major's qurter"
-	data["RoomId"] = id
-	data["RoomName"] = room
-
 	q := r.URL.Query()
+	id := q.Get("roomId")
+	if len(id) == 0 {
+		panic("roomId is required.")
+	}
+
+	var room models.Room
+	err := repository.Db().QueryRow(
+		"SELECT id, name FROM rooms r WHERE id = $1;", id,
+	).Scan(&room.ID, &room.Name)
+	if err != nil {
+		panic(err)
+	}
+	data["RoomId"] = room.ID
+	data["RoomName"] = room.Name
+
 	los := models.SearchForm{
 		Start: q.Get("arrival"),
 		End:   q.Get("departure"),
