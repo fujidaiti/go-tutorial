@@ -1,5 +1,9 @@
 include .env
 
+.PHONY: dev
+dev:
+	env $$(cat .env | xargs) go run cmd/web/*.go
+
 .PHONY: db-migrate
 db-migrate:
 	env $$(cat .env | xargs) go run ./cmd/migrate
