@@ -81,7 +81,7 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	renderer.RenderTemplate(w, "search", data)
 }
 
-func Book(w http.ResponseWriter, r *http.Request) {
+func Booking(w http.ResponseWriter, r *http.Request) {
 	data := renderer.DefaultData(r)
 	data["FormResult"] = models.BookingFormValidationResult{}
 
@@ -109,7 +109,7 @@ func Book(w http.ResponseWriter, r *http.Request) {
 	renderer.RenderTemplate(w, "booking-form", data)
 }
 
-func PostBook(w http.ResponseWriter, r *http.Request) {
+func PostBooking(w http.ResponseWriter, r *http.Request) {
 	// TODO: Check if ID is valid
 	id := r.PathValue("roomId")
 
