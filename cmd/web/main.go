@@ -24,13 +24,11 @@ func main() {
 	r.Get("/", handlers.Home)
 	r.Get("/about", handlers.About)
 	r.Get("/contact", handlers.Contact)
-	// TODO: Rename this root to /standard
-	r.Get("/generals-quarters", handlers.Generals)
-	// TODO: Rename this root to /superior
-	r.Get("/majors-suite", handlers.Majors)
-	// TODO: Add /deluxe root
+	r.Get("/standard", handlers.Standard)
 	r.Get("/standard/search", handlers.SearchStandardRooms)
+	r.Get("/superior", handlers.Superior)
 	r.Get("/superior/search", handlers.SearchSuperiorRooms)
+	r.Get("/deluxe", handlers.Deluxe)
 	r.Get("/deluxe/search", handlers.SearchDeluxeRooms)
 	r.Get("/search", handlers.Search)
 	r.Get("/booking", handlers.Booking)

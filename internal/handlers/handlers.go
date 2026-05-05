@@ -25,12 +25,16 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 	renderer.RenderTemplate(w, "contact", renderer.DefaultData(r))
 }
 
-func Generals(w http.ResponseWriter, r *http.Request) {
-	renderer.RenderTemplate(w, "generals", renderer.DefaultData(r))
+func Standard(w http.ResponseWriter, r *http.Request) {
+	renderer.RenderTemplate(w, "standard", renderer.DefaultData(r))
 }
 
-func Majors(w http.ResponseWriter, r *http.Request) {
-	renderer.RenderTemplate(w, "majors", renderer.DefaultData(r))
+func Superior(w http.ResponseWriter, r *http.Request) {
+	renderer.RenderTemplate(w, "superior", renderer.DefaultData(r))
+}
+
+func Deluxe(w http.ResponseWriter, r *http.Request) {
+	renderer.RenderTemplate(w, "deluxe", renderer.DefaultData(r))
 }
 
 func Search(w http.ResponseWriter, r *http.Request) {
