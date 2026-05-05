@@ -49,7 +49,7 @@ func (s *SearchForm) Validate() SearchFormValidationResult {
 		return result
 	}
 
-	if end.Before(start) {
+	if end.Equal(start) || end.Before(start) {
 		result.HasEndDateErr = true
 		result.EndDateErr = "End date must be after start date."
 		return result

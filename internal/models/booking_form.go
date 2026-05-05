@@ -56,7 +56,7 @@ func (f *BookingForm) Validate() BookingFormValidationResult {
 	if depErr != nil {
 		result.ArrivalErr = "Invalid departure date format. Please use YYYY-MM-DD."
 	}
-	if arrErr == nil && depErr == nil && dep.Before(arr) {
+	if arrErr == nil && depErr == nil && (dep.Equal(arr) || dep.Before(arr)) {
 		result.DepartureErr = "Departure date must be after arrival date."
 	}
 
