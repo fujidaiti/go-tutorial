@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/fujidaiti/bookings/internal/models"
 	"github.com/fujidaiti/bookings/internal/renderer"
+	_ "github.com/lib/pq"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -43,17 +45,46 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	data["Form"] = form
 	data["FormResult"] = result
-	// TODO: Look up DB and return actual results
-	if result.Valid() {
-		data["IsFormValid"] = true
-		data["AvailableRooms"] = []models.Room{
-			{ID: 1, Name: "General's Quarters"},
-			{ID: 2, Name: "Major's Suite"},
-		}
-	} else {
+	if !result.Valid() {
 		data["IsFormValid"] = false
+		renderer.RenderTemplate(w, "search", data)
+		return
+	} else {
+		data["IsFormValid"] = true
+		}
+
+	db, err := sql.Open("postgres", "sslmode=disable")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query(`
+		SELECT r.id, r.name
+		FROM rooms r
+		WHERE NOT EXISTS (
+			SELECT 1
+			FROM room_restrictions rr
+			WHERE rr.room_id = r.id
+				AND rr.arrival_date <= $2
+				AND rr.departure_date >= $1
+		);
+	`, form.Start, form.End)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	var rooms []models.Room
+	for rows.Next() {
+		var r models.Room
+		if err := rows.Scan(&r.ID, &r.Name); err != nil {
+			panic(err)
+		}
+		rooms = append(rooms, r)
 	}
 
+	data["AvailableRooms"] = rooms
 	renderer.RenderTemplate(w, "search", data)
 }
 
