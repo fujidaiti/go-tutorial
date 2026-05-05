@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -218,7 +219,11 @@ func PostBooking(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	renderer.RenderTemplate(w, "booking-details", data)
+	http.Redirect(w, r, fmt.Sprintf("/booking/%d", bookingId), 303)
+}
+
+func BookingDetails(w http.ResponseWriter, r *http.Request) {
+	renderer.RenderTemplate(w, "booking-details", renderer.DefaultData(r))
 }
 
 func ReservationSummary(w http.ResponseWriter, r *http.Request) {
