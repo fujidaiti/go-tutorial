@@ -39,7 +39,9 @@ func main() {
 	r.Get("/booking", handlers.Booking)
 	r.Post("/booking", handlers.PostBooking)
 	r.Get("/booking/{id}", handlers.BookingDetails)
+	// TODO: Add GET /booking/history route
 	r.Get("/login", handlers.Login)
 	r.Post("/login", handlers.PostLogin)
+	// TODO: Add POST /logout route
 	http.ListenAndServe(portNumber, r)
 }
