@@ -310,3 +310,25 @@ func BookingDetails(w http.ResponseWriter, r *http.Request) {
 	data["Status"] = status
 	renderer.RenderTemplate(w, "booking-details", data)
 }
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	renderer.RenderTemplate(w, "login-form", renderer.DefaultData(r))
+}
+
+func PostLogin(w http.ResponseWriter, r *http.Request) {
+	data := renderer.DefaultData(r)
+
+	form := models.LoginForm{
+		Email:    r.Form.Get("email"),
+		Password: r.Form.Get("password"),
+	}
+	result := form.Validate()
+	data["Form"] = form
+	data["FormResult"] = result
+	if !result.IsValid() {
+		renderer.RenderTemplate(w, "login-form", data)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

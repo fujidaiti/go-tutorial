@@ -1,0 +1,27 @@
+{{ template "base" . }}
+
+{{define "content"}}
+<h1>Login</h1>
+<form method="POST" action="/login">
+  <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}"/>
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" value="{{ .Form.Email }}" />
+  <br />
+
+  <label for="password">Password:</label>
+  <input type="text" id="password" name="password" value="{{ .Form.Password }}" />
+  <br />
+
+  <button type="submit">Login</button>
+</form>
+
+{{with .FormResult}}
+{{with .EmailErr}}
+<p style="color: red;">{{.}}</p>
+{{end}}
+{{with .PasswordErr}}
+<p style="color: red;">{{.}}</p>
+{{end}}
+{{end}}
+{{ end }}
