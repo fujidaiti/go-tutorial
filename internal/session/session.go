@@ -1,7 +1,6 @@
 package session
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -35,15 +34,15 @@ func SetGuestCredential(id int, r *http.Request) {
 	sessionManager.Put(ctx, guestIdKey, id)
 }
 
-func GetGuestCredential(r *http.Request) (int, error) {
+func GetGuestCredential(r *http.Request) (int, bool) {
 	id := sessionManager.GetInt(r.Context(), guestIdKey)
 	if id == 0 {
-		return 0, errors.New("Guest id is not found in the session data.")
+		return 0, false
 	}
-	return id, nil
+	return id, true
 }
 
 func IsGuestLoggedIn(r *http.Request) bool {
-	_, err := GetGuestCredential(r)
-	return err == nil
+	_, ok := GetGuestCredential(r)
+	return ok
 }

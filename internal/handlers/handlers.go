@@ -234,17 +234,22 @@ func PostBooking(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	var guestId *int
+	if id, loggedIn := session.GetGuestCredential(r); loggedIn {
+		guestId = &id
+	}
+
 	var bookingId int
 	err = tx.QueryRow(
 		`INSERT INTO bookings (
 			first_name, last_name, email, phone,
-			arrival_date, departure_date, room_id
+			arrival_date, departure_date, room_id, guest_id
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id;
 		`,
 		form.FirstName, form.LastName, form.Email, form.Phone,
-		form.Arrival, form.Departure, roomId,
+		form.Arrival, form.Departure, roomId, guestId,
 	).Scan(&bookingId)
 	if err != nil {
 		panic(err)
