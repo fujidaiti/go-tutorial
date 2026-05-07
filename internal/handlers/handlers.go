@@ -10,6 +10,7 @@ import (
 	"github.com/fujidaiti/bookings/internal/models"
 	"github.com/fujidaiti/bookings/internal/renderer"
 	"github.com/fujidaiti/bookings/internal/repository"
+	"github.com/fujidaiti/bookings/internal/session"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -331,7 +332,8 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var id, pwdHash string
+	var id int
+	var pwdHash string
 	err := repository.Db().QueryRow(`
 	SELECT g.id, g.pwd_hash
 	FROM guests g
@@ -351,7 +353,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 		// Successfully logged in.
-		// TODO: Save the id to the session.
+		session.SetGuestCredential(id, r)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -371,6 +373,6 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	// TODO: Save the id to the session.
+	session.SetGuestCredential(id, r)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

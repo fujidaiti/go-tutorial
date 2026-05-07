@@ -6,6 +6,7 @@ import (
 	"github.com/fujidaiti/bookings/internal/handlers"
 	"github.com/fujidaiti/bookings/internal/middlewares"
 	"github.com/fujidaiti/bookings/internal/repository"
+	"github.com/fujidaiti/bookings/internal/session"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -13,6 +14,7 @@ import (
 const portNumber = ":8080"
 
 func main() {
+	session.Init()
 	err := repository.Init()
 	if err != nil {
 		panic(err)
@@ -20,7 +22,12 @@ func main() {
 	defer repository.Db().Close()
 
 	r := chi.NewRouter()
-	r.Use(middleware.Logger, middlewares.NoSurf, middleware.Recoverer)
+	r.Use(
+		middleware.Logger,
+		middlewares.NoSurf,
+		session.LoadAndSave(),
+		middleware.Recoverer,
+	)
 	r.Get("/", handlers.Home)
 	r.Get("/standard", handlers.Standard)
 	r.Get("/standard/search", handlers.SearchStandardRooms)

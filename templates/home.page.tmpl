@@ -3,7 +3,9 @@
 {{define "content"}}
 <h1>Welcome to Heartbreak Hotel</h1>
 <p><a href="/search">Search available rooms</a></p>
+{{if not .LoggedIn}}
 <p><a href="/login">Login</a></p>
+{{end}}
 <h2>Rooms</h2>
 <ul>
   <li><a href="/standard">Standard</a></li>

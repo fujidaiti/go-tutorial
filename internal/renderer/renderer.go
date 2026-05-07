@@ -6,12 +6,14 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/fujidaiti/bookings/internal/session"
 	"github.com/justinas/nosurf"
 )
 
 func DefaultData(r *http.Request) map[string]any {
 	return map[string]any{
 		"CSRFToken": nosurf.Token(r),
+		"LoggedIn":  session.IsGuestLoggedIn(r),
 	}
 }
 
