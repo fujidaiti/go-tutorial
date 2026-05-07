@@ -275,21 +275,28 @@ func PostBooking(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/booking/%d", bookingId), 303)
 }
 
-// TODO: Make this page visible from only person who made this reservation.
 func BookingDetails(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		panic(err)
 	}
 
+	guestId, loggedIn := session.GetGuestCredential(r)
+	if !loggedIn {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("Log-in to see the booking details."))
+		return
+	}
+
 	var bk models.BookingForm
 	var status string
 	var roomName string
 	var roomGrade string
+	var bkGuestId *int
 	err = repository.Db().QueryRow(
 		`SELECT
 			r.name, b.arrival_date, b.departure_date, b.first_name,
-			b.last_name, b.email, b.phone, b.status, g.Name
+			b.last_name, b.email, b.phone, b.status, b.guest_id, g.Name
 		FROM bookings b
 		JOIN rooms r ON b.room_id = r.id
 		JOIN grades g ON r.grade_id = g.id
@@ -297,10 +304,15 @@ func BookingDetails(w http.ResponseWriter, r *http.Request) {
 		`, id,
 	).Scan(
 		&roomName, &bk.Arrival, &bk.Departure, &bk.FirstName,
-		&bk.LastName, &bk.Email, &bk.Phone, &status, &roomGrade,
+		&bk.LastName, &bk.Email, &bk.Phone, &status, &bkGuestId, &roomGrade,
 	)
 	if err != nil {
 		panic(err)
+	}
+	if bkGuestId == nil || *bkGuestId != guestId {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("It seems like you don't have access to this booking details."))
+		return
 	}
 
 	if t, err := time.Parse(time.RFC3339, bk.Arrival); err == nil {
