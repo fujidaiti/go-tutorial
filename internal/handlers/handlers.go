@@ -10,6 +10,7 @@ import (
 	"github.com/fujidaiti/bookings/internal/models"
 	"github.com/fujidaiti/bookings/internal/renderer"
 	"github.com/fujidaiti/bookings/internal/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -330,5 +331,46 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var id, pwdHash string
+	err := repository.Db().QueryRow(`
+	SELECT g.id, g.pwd_hash
+	FROM guests g
+	WHERE g.email = $1
+	`, form.Email,
+	).Scan(&id, &pwdHash)
+
+	if err == nil {
+		// The email is already registered.
+		err := bcrypt.CompareHashAndPassword([]byte(pwdHash), []byte(form.Password))
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			data["LoginErr"] = "The email and/or passward are incorrect."
+			renderer.RenderTemplate(w, "login-form", data)
+			return
+		}
+		if err != nil {
+			panic(err)
+		}
+		// Successfully logged in.
+		// TODO: Save the id to the session.
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	// The email is not yet registered, let's create a new account.
+	formPwdHash, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	err = repository.Db().QueryRow(`
+		INSERT INTO guests (email, pwd_hash)
+		VALUES ($1, $2)
+		RETURNING id
+		`, form.Email, formPwdHash,
+	).Scan(&id)
+	if err != nil {
+		panic(err)
+	}
+
+	// TODO: Save the id to the session.
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
